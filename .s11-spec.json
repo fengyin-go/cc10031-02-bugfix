@@ -1,0 +1,732 @@
+{
+  "domain": "数据工程",
+  "subdirection": "数据采集、爬虫与RPA",
+  "app_name": "RPA流程自动化中心",
+  "app_slug": "cc10031",
+  "app_desc": "面向企业数据采集场景，提供RPA流程编排、元素定位、执行调度和结果校验的自动化运营平台",
+  "frontend": "vue",
+  "backend": "python",
+  "port_frontend": 5173,
+  "port_backend": 8000,
+  "modules": [
+    {
+      "key": "bot_definition",
+      "name": "流程定义",
+      "entity": "RPA流程",
+      "fields": [
+        "流程名称",
+        "目标系统",
+        "触发方式",
+        "执行环境",
+        "超时上限",
+        "失败策略",
+        "版本号"
+      ],
+      "statuses": [
+        "草稿",
+        "测试中",
+        "已发布",
+        "已停用"
+      ],
+      "actions": [
+        "发布流程",
+        "停用流程"
+      ],
+      "action_targets": [
+        "测试中",
+        "已发布"
+      ],
+      "metrics": [
+        "流程总数",
+        "已发布数",
+        "停用数"
+      ],
+      "desc": "管理RPA自动化流程的全生命周期，包括目标系统、触发方式和执行环境配置",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "page_shape": "dag-graph",
+      "key": "step_editor",
+      "name": "步骤编排",
+      "entity": "流程步骤",
+      "fields": [
+        "步骤序号",
+        "步骤名称",
+        "操作类型",
+        "目标元素",
+        "输入参数",
+        "等待策略",
+        "异常处理"
+      ],
+      "statuses": [
+        "草稿",
+        "已编排",
+        "已验证",
+        "已废弃"
+      ],
+      "actions": [
+        "提交编排",
+        "验证步骤",
+        "废弃步骤"
+      ],
+      "action_targets": [
+        "草稿",
+        "已编排",
+        "已验证"
+      ],
+      "metrics": [
+        "步骤总数",
+        "已验证数",
+        "废弃数"
+      ],
+      "desc": "可视化编排RPA流程中的操作步骤，定义元素定位、输入参数和异常处理路径",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "element_selector",
+      "name": "元素定位",
+      "entity": "定位规则",
+      "fields": [
+        "规则名称",
+        "选择器类型",
+        "定位表达式",
+        "匹配策略",
+        "等待条件",
+        "回退方案",
+        "所属流程"
+      ],
+      "statuses": [
+        "草稿",
+        "已测试",
+        "已启用",
+        "定位失效"
+      ],
+      "actions": [
+        "测试定位",
+        "启用规则"
+      ],
+      "action_targets": [
+        "草稿",
+        "已测试"
+      ],
+      "metrics": [
+        "规则总数",
+        "已启用数",
+        "失效数"
+      ],
+      "desc": "管理RPA的目标界面元素定位规则，支持多种选择器类型和匹配策略",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "trigger_config",
+      "name": "触发配置",
+      "entity": "触发器",
+      "fields": [
+        "触发器名称",
+        "触发类型",
+        "调度表达式",
+        "事件源",
+        "前置条件",
+        "延迟窗口",
+        "并发控制"
+      ],
+      "statuses": [
+        "草稿",
+        "已激活",
+        "已暂停",
+        "已过期"
+      ],
+      "actions": [
+        "激活触发器",
+        "暂停触发器"
+      ],
+      "action_targets": [
+        "草稿",
+        "已激活"
+      ],
+      "metrics": [
+        "触发器总数",
+        "已激活数",
+        "暂停数"
+      ],
+      "desc": "管理RPA流程的触发机制，支持定时调度和事件驱动两种模式",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "execution_log",
+      "name": "执行记录",
+      "entity": "执行日志",
+      "fields": [
+        "执行编号",
+        "所属流程",
+        "开始时间",
+        "结束时间",
+        "执行状态",
+        "采集行数",
+        "错误摘要"
+      ],
+      "statuses": [
+        "执行中",
+        "执行成功",
+        "执行失败",
+        "已超时",
+        "已取消"
+      ],
+      "actions": [
+        "归档日志"
+      ],
+      "action_targets": [
+        "执行成功"
+      ],
+      "metrics": [
+        "执行总数",
+        "成功数",
+        "失败数"
+      ],
+      "desc": "记录每次RPA流程的完整执行日志，包括起止时间、状态和数据量统计",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "data_extract",
+      "name": "数据提取",
+      "entity": "提取规则",
+      "fields": [
+        "规则名称",
+        "源页面结构",
+        "提取字段",
+        "提取路径",
+        "数据类型",
+        "格式化",
+        "去空策略"
+      ],
+      "statuses": [
+        "草稿",
+        "已测试",
+        "已生效",
+        "已过期"
+      ],
+      "actions": [
+        "测试提取",
+        "启用规则"
+      ],
+      "action_targets": [
+        "草稿",
+        "已测试"
+      ],
+      "metrics": [
+        "规则总数",
+        "已生效数",
+        "过期数"
+      ],
+      "desc": "定义从采集页面中提取结构化数据的字段映射、路径和格式化规则",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "credential_store",
+      "name": "凭据管理",
+      "entity": "系统凭据",
+      "fields": [
+        "凭据名称",
+        "目标系统",
+        "认证方式",
+        "账户标识",
+        "有效期",
+        "轮换周期",
+        "最后使用"
+      ],
+      "statuses": [
+        "正常",
+        "即将过期",
+        "已过期",
+        "已吊销"
+      ],
+      "actions": [
+        "轮换凭据",
+        "吊销凭据"
+      ],
+      "action_targets": [
+        "即将过期",
+        "正常"
+      ],
+      "metrics": [
+        "凭据总数",
+        "正常数",
+        "过期数"
+      ],
+      "desc": "安全管理RPA连接各目标系统的账户凭据，支持轮换和过期告警",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "env_profile",
+      "name": "环境配置",
+      "entity": "执行环境",
+      "fields": [
+        "环境名称",
+        "浏览器版本",
+        "操作系统",
+        "网络代理",
+        "分辨率",
+        "插件列表",
+        "沙箱模式"
+      ],
+      "statuses": [
+        "待验证",
+        "可用",
+        "维护中",
+        "已退役"
+      ],
+      "actions": [
+        "验证环境",
+        "标记退役"
+      ],
+      "action_targets": [
+        "待验证",
+        "可用"
+      ],
+      "metrics": [
+        "环境总数",
+        "可用数",
+        "维护数"
+      ],
+      "desc": "管理RPA执行的环境配置，包括浏览器、代理和沙箱隔离",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "anti_block",
+      "name": "反封锁",
+      "entity": "防护策略",
+      "fields": [
+        "策略名称",
+        "目标站点",
+        "请求间隔",
+        "IP代理池",
+        "UA轮换",
+        "验证码处理",
+        "Cookie策略"
+      ],
+      "statuses": [
+        "草稿",
+        "已启用",
+        "触发封锁",
+        "已停用"
+      ],
+      "actions": [
+        "启用策略",
+        "停用策略"
+      ],
+      "action_targets": [
+        "草稿",
+        "已启用"
+      ],
+      "metrics": [
+        "策略总数",
+        "已启用数",
+        "封锁数"
+      ],
+      "desc": "配置反封锁防护策略，管理请求间隔、代理轮换和验证码处理",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "result_verify",
+      "name": "结果校验",
+      "entity": "校验规则",
+      "fields": [
+        "规则名称",
+        "校验字段",
+        "校验条件",
+        "期望模式",
+        "异常动作",
+        "抽样比例",
+        "关联流程"
+      ],
+      "statuses": [
+        "草稿",
+        "已启用",
+        "已关闭"
+      ],
+      "actions": [
+        "启用规则",
+        "关闭规则"
+      ],
+      "action_targets": [
+        "草稿",
+        "已启用"
+      ],
+      "metrics": [
+        "规则总数",
+        "已启用数",
+        "关闭数"
+      ],
+      "desc": "定义采集结果的自动化校验规则，包括字段完整性、格式合规和异常处置",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "batch_tracker",
+      "name": "批次追踪",
+      "entity": "采集批次",
+      "fields": [
+        "批次编号",
+        "触发流程",
+        "采集时间",
+        "目标条数",
+        "成功条数",
+        "遗漏条数",
+        "校验状态"
+      ],
+      "statuses": [
+        "收集中",
+        "已收集",
+        "校验中",
+        "已完成",
+        "有遗漏"
+      ],
+      "actions": [
+        "发起校验",
+        "确认完成"
+      ],
+      "action_targets": [
+        "已收集",
+        "有遗漏"
+      ],
+      "metrics": [
+        "批次总数",
+        "完成数",
+        "遗漏批次数"
+      ],
+      "desc": "追踪每次RPA采集批次的目标、实际和遗漏记录数",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "page_model",
+      "name": "页面建模",
+      "entity": "页面模型",
+      "fields": [
+        "模型名称",
+        "目标站点",
+        "页面结构",
+        "动态元素",
+        "分页模式",
+        "加载策略",
+        "版本号"
+      ],
+      "statuses": [
+        "草稿",
+        "已验证",
+        "已使用",
+        "结构失效"
+      ],
+      "actions": [
+        "验证模型",
+        "标记失效"
+      ],
+      "action_targets": [
+        "草稿",
+        "已验证"
+      ],
+      "metrics": [
+        "模型总数",
+        "已使用数",
+        "失效数"
+      ],
+      "desc": "为目标采集站点建立页面结构模型，识别动态元素和分页模式",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "data_enrich",
+      "name": "数据补全",
+      "entity": "补全规则",
+      "fields": [
+        "规则名称",
+        "目标字段",
+        "补全来源",
+        "匹配键",
+        "补全方式",
+        "缺失处理",
+        "数据时效"
+      ],
+      "statuses": [
+        "草稿",
+        "已生效",
+        "已停用"
+      ],
+      "actions": [
+        "启用规则",
+        "停用规则"
+      ],
+      "action_targets": [
+        "草稿",
+        "已生效"
+      ],
+      "metrics": [
+        "规则总数",
+        "已生效数",
+        "停用数"
+      ],
+      "desc": "定义采集数据的补全规则，从外部数据源填充缺失字段",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "proxy_router",
+      "name": "代理路由",
+      "entity": "代理节点",
+      "fields": [
+        "节点名称",
+        "IP地址",
+        "出口地域",
+        "协议类型",
+        "带宽上限",
+        "延迟",
+        "可用状态"
+      ],
+      "statuses": [
+        "在线",
+        "离线",
+        "限速中",
+        "已禁用"
+      ],
+      "actions": [
+        "启用节点",
+        "禁用节点"
+      ],
+      "action_targets": [
+        "离线",
+        "限速中"
+      ],
+      "metrics": [
+        "节点总数",
+        "在线数",
+        "离线数"
+      ],
+      "desc": "管理RPA采集使用的代理节点池，监控各节点地域、带宽和可用状态",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "rate_limiter",
+      "name": "频控策略",
+      "entity": "频控规则",
+      "fields": [
+        "规则名称",
+        "目标站点",
+        "每秒上限",
+        "每日上限",
+        "并发上限",
+        "冷却时间",
+        "优先级"
+      ],
+      "statuses": [
+        "草稿",
+        "已生效",
+        "已暂停",
+        "已超限"
+      ],
+      "actions": [
+        "启用规则",
+        "暂停规则"
+      ],
+      "action_targets": [
+        "草稿",
+        "已生效"
+      ],
+      "metrics": [
+        "规则总数",
+        "已生效数",
+        "超限数"
+      ],
+      "desc": "管理RPA采集的请求频控规则，分站点设置每秒、每日和并发上限",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "output_format",
+      "name": "输出格式",
+      "entity": "格式模板",
+      "fields": [
+        "模板名称",
+        "输出类型",
+        "字段映射",
+        "分隔符",
+        "编码方式",
+        "嵌套展开",
+        "空值表示"
+      ],
+      "statuses": [
+        "草稿",
+        "已应用",
+        "已废弃"
+      ],
+      "actions": [
+        "应用模板",
+        "废弃模板"
+      ],
+      "action_targets": [
+        "草稿",
+        "已应用"
+      ],
+      "metrics": [
+        "模板总数",
+        "已应用数",
+        "废弃数"
+      ],
+      "desc": "管理RPA采集结果的输出格式模板，定义字段映射和序列化参数",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "anomaly_log",
+      "name": "异常日志",
+      "entity": "异常事件",
+      "fields": [
+        "事件编号",
+        "关联流程",
+        "异常类型",
+        "异常详情",
+        "发生步骤",
+        "发生时间",
+        "恢复状态"
+      ],
+      "statuses": [
+        "未处理",
+        "处理中",
+        "已恢复",
+        "已忽略"
+      ],
+      "actions": [
+        "标记恢复",
+        "忽略事件"
+      ],
+      "action_targets": [
+        "未处理",
+        "处理中"
+      ],
+      "metrics": [
+        "事件总数",
+        "未处理数",
+        "已恢复数"
+      ],
+      "desc": "记录和追踪RPA执行过程中的各类异常事件及其恢复状态",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "scheduler",
+      "name": "调度计划",
+      "entity": "采集计划",
+      "fields": [
+        "计划名称",
+        "绑定流程",
+        "cron表达式",
+        "执行窗口",
+        "并发数",
+        "优先级",
+        "通知渠道"
+      ],
+      "statuses": [
+        "草稿",
+        "已激活",
+        "已暂停",
+        "已归档"
+      ],
+      "actions": [
+        "激活计划",
+        "暂停计划",
+        "归档计划"
+      ],
+      "action_targets": [
+        "草稿",
+        "已激活",
+        "已暂停"
+      ],
+      "metrics": [
+        "计划总数",
+        "已激活数",
+        "归档数"
+      ],
+      "desc": "管理RPA流程的定时采集计划，定义cron调度、执行窗口和并发上限",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    },
+    {
+      "page_shape": "analysis-dashboard",
+      "key": "report_dashboard",
+      "name": "运行概览",
+      "entity": "运行数据",
+      "fields": [
+        "统计日期",
+        "总执行数",
+        "成功数",
+        "失败数",
+        "平均耗时",
+        "采集总量",
+        "可用率"
+      ],
+      "statuses": [
+        "正常",
+        "下降",
+        "异常"
+      ],
+      "actions": [
+        "刷新概览"
+      ],
+      "action_targets": [
+        "正常"
+      ],
+      "metrics": [
+        "总执行数",
+        "成功率",
+        "可用率"
+      ],
+      "desc": "聚合展示RPA平台的运行统计、采集总量和可用率趋势",
+      "_page_shape_explicit": true
+    },
+    {
+      "key": "task_queue",
+      "name": "任务队列",
+      "entity": "排队任务",
+      "fields": [
+        "任务编号",
+        "流程名称",
+        "提交时间",
+        "优先级",
+        "预计执行",
+        "排队时长",
+        "当前状态"
+      ],
+      "statuses": [
+        "排队中",
+        "执行中",
+        "已完成",
+        "已取消",
+        "执行失败"
+      ],
+      "actions": [
+        "取消任务",
+        "提升优先级"
+      ],
+      "action_targets": [
+        "排队中",
+        "排队中"
+      ],
+      "metrics": [
+        "队列总数",
+        "排队中数",
+        "失败数"
+      ],
+      "desc": "管理RPA采集任务的优先级队列，支持任务取消和动态优先级调整",
+      "page_shape": "crud-table",
+      "_page_shape_explicit": true
+    }
+  ]
+}
