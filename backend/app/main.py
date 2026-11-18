@@ -5,7 +5,9 @@
 """
 from __future__ import annotations
 
-from fastapi import FastAPI, Query
+from typing import Any
+
+from fastapi import Body, FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
@@ -72,6 +74,9 @@ def nodestats(module: str | None = Query(default=None)) -> dict[str, object]:
         "dirty_vault": store.dirty_vault.snapshot(),
         "collect_records": store.collect_records.snapshot(),
         "recovery": store.recovery.snapshot(),
+        "quality_lineage": store.quality_lineage.snapshot(),
+        "quarantine_ledger": store.quarantine_ledger.snapshot(),
+        "quality_reports": store.quality_reports.snapshot(),
     }
 
     return {"modules": snapshots, "infrastructure": infra}
@@ -226,6 +231,108 @@ def pipeline_element_execution() -> dict[str, object]:
     """触发元素定位与自动化执行流程。"""
     result = runtime_session.consume_strategies_and_execute()
     return {"ok": True, "result": result}
+
+
+# ---- 校验工作台 API（结果校验模块的覆盖修复配套） ----
+
+@app.get("/api/verify-workbench/summary")
+def verify_workbench_summary() -> dict[str, object]:
+    """校验工作台总览：每条规则的抽样数、执行数、覆盖状态，以及
+    质量列表与隔离工作台待复核记录的一致性核对。"""
+    from app.services import ResultVerifyService
+
+    svc = ResultVerifyService()
+    reports = [
+        {
+            "batch_ref": report.batch_ref,
+            "status": report.status,
+            "passed": report.passed,
+            "failed": report.failed,
+            "uncovered": report.uncovered,
+            "sampled_records": report.sampled_records,
+            "unsampled_records": report.unsampled_records,
+            "uncovered_list": report.uncovered_list,
+            "strategy": report.strategy,
+            "version": report.version,
+        }
+        for report in store.quality_reports.list_current()
+    ]
+    return {
+        "rules": svc.get_rule_coverage_stats(),
+        "stats": svc.get_validation_stats(),
+        "consistency": svc.check_consistency(),
+        "reports": reports,
+    }
+
+
+@app.get("/api/verify-workbench/lineage")
+def verify_workbench_lineage(
+    batch_ref: str | None = Query(default=None),
+) -> dict[str, object]:
+    """采集质量谱系数据集：每条记录的抽样覆盖与最终质量状态。"""
+    from app.services import ResultVerifyService
+
+    svc = ResultVerifyService()
+    receipts = svc.get_validation_receipts(batch_ref)
+    return {"count": len(receipts), "items": receipts}
+
+
+@app.get("/api/verify-workbench/receipts")
+def verify_workbench_receipts(
+    batch_ref: str | None = Query(default=None),
+) -> dict[str, object]:
+    """校验收据明细：每条记录逐规则的抽样/执行/通过事实。"""
+    from app.services import ResultVerifyService
+
+    svc = ResultVerifyService()
+    receipts = svc.get_validation_receipts(batch_ref)
+    return {"count": len(receipts), "items": receipts}
+
+
+@app.get("/api/verify-workbench/quarantine")
+def verify_workbench_quarantine(
+    batch_ref: str | None = Query(default=None),
+) -> dict[str, object]:
+    """隔离工作台待复核记录：隔离回执与当前最终质量状态保持一致。"""
+    from app.services import ResultVerifyService
+
+    svc = ResultVerifyService()
+    reviews = svc.get_quarantine_review_list(batch_ref)
+    return {
+        "count": len(reviews),
+        "items": reviews,
+        "consistency": svc.check_consistency(batch_ref),
+    }
+
+
+@app.post("/api/verify-workbench/verify")
+def verify_workbench_run() -> dict[str, object]:
+    """执行采集结果校验：读取原始采集记录与已启用校验规则，
+    生成带覆盖状态的采集质量谱系数据集。"""
+    from app.services import ResultVerifyService
+
+    svc = ResultVerifyService()
+    result = svc.verify_collected_data()
+    return {"ok": True, "result": result, "consistency": svc.check_consistency()}
+
+
+@app.post("/api/verify-workbench/resolve-batch")
+def verify_workbench_resolve_batch(
+    payload: dict[str, Any] = Body(...),
+) -> dict[str, object]:
+    """处理低覆盖批次与已发布质量结果的冲突。
+
+    strategy=resample：整批重抽后替换报告；
+    strategy=append：保留旧报告并追加未覆盖清单。
+    两种方案都只产生一个最终质量状态。
+    """
+    from app.services import ResultVerifyService
+
+    batch_ref = str(payload.get("batch_ref", ""))
+    strategy = str(payload.get("strategy", "resample"))
+    svc = ResultVerifyService()
+    result = svc.resolve_low_coverage_batch(batch_ref, strategy)
+    return {**result, "consistency": svc.check_consistency(batch_ref)}
 
 
 # 资源路由含 /api/{module}，必须放在 health / overview 之后注册，

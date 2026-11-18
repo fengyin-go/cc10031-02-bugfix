@@ -106,3 +106,46 @@ export async function loadRecoveryStats(): Promise<Record<string, unknown>> {
   if (!response.ok) throw new Error('恢复状态查询失败')
   return await response.json()
 }
+
+/** 校验工作台：规则覆盖统计（抽样数/执行数/覆盖状态）与一致性核对 */
+export async function loadVerifyWorkbenchSummary(): Promise<Record<string, unknown>> {
+  const response = await request('/api/verify-workbench/summary')
+  if (!response.ok) throw new Error('校验工作台读取失败')
+  return await response.json()
+}
+
+/** 校验工作台：采集质量谱系数据集（带覆盖状态） */
+export async function loadVerifyLineage(batchRef?: string): Promise<Record<string, unknown>> {
+  const query = batchRef ? `?batch_ref=${encodeURIComponent(batchRef)}` : ''
+  const response = await request(`/api/verify-workbench/lineage${query}`)
+  if (!response.ok) throw new Error('采集质量谱系读取失败')
+  return await response.json()
+}
+
+/** 校验工作台：隔离区待复核记录（隔离回执） */
+export async function loadVerifyQuarantine(batchRef?: string): Promise<Record<string, unknown>> {
+  const query = batchRef ? `?batch_ref=${encodeURIComponent(batchRef)}` : ''
+  const response = await request(`/api/verify-workbench/quarantine${query}`)
+  if (!response.ok) throw new Error('隔离待复核记录读取失败')
+  return await response.json()
+}
+
+/** 校验工作台：执行采集结果校验 */
+export async function runVerifyCollected(): Promise<Record<string, unknown>> {
+  const response = await request('/api/verify-workbench/verify', { method: 'POST' })
+  if (!response.ok) throw new Error('校验执行失败')
+  return await response.json()
+}
+
+/** 校验工作台：处理低覆盖批次冲突（resample 整批重抽替换 / append 保留并追加未覆盖清单） */
+export async function resolveVerifyBatch(
+  batchRef: string,
+  strategy: 'resample' | 'append',
+): Promise<Record<string, unknown>> {
+  const response = await request('/api/verify-workbench/resolve-batch', {
+    method: 'POST',
+    body: JSON.stringify({ batch_ref: batchRef, strategy }),
+  })
+  if (!response.ok) throw new Error('低覆盖批次处理失败')
+  return await response.json()
+}
